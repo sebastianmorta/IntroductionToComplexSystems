@@ -2,40 +2,54 @@ import random
 from random import randint
 
 
+def removeDuplicates(lst):
+    res = []
+    for i in lst:
+        if i not in res:
+            res.append(i)
+    return res
+
+
 class Graph:
     def __init__(self, amount_of_nodes, list_of_edges):
         self.nodes = [Node(list_of_edges[i], i) for i in range(amount_of_nodes)]
 
     def assignEdgesToNodes(self):
-        iter=1
+        iter = 1
         for node in self.nodes:
             tmp_list = self.nodes[iter:]
             if not tmp_list:
                 continue
             print("$$$$$$$$$$$$$$$$$$$$new$$$$$$$$$$$$$$$$$$$$$$$$")
             for i in range(node.amount_of_edges):
-                print("nodes  ",len(self.nodes))
-                print("tmp  ",len(tmp_list))
-                print("iter  ",iter)
-                rand=randint(0, len(tmp_list)-1)
-                print("rand  ",rand)
+                print("nodes  ", len(self.nodes))
+                print("tmp  ", len(tmp_list))
+                print("iter  ", iter)
+                rand = randint(0, len(tmp_list) - 1)
+                print("rand  ", rand)
                 print("-----------------------------")
                 self.chooseConnection(node, tmp_list[rand])
                 tmp_list.remove(tmp_list[rand])
-            iter+=1
+            iter += 1
 
     def chooseConnection(self, current_node, other_node):
         current_node.assignEdges(other_node)
         other_node.assignEdges(current_node)
 
-
     def printer(self):
+        h = []
         for node in self.nodes:
             print("node number: ", node.number_of_node)
             print("amount of edges: ", node.amount_of_edges)
             for edge in node.edges:
                 print("edge from: ", edge.edge_from, "edge to: ", edge.edge_to)
+                h.append(edge)
             print("===================================================================")
+        print(h)
+        print(len(h))
+        h = removeDuplicates(h)
+        print(h)
+        print(len(h))
 
 
 class Node:
@@ -53,10 +67,14 @@ class Edge:
         self.edge_from = edge_from
         self.edge_to = edge_to
 
+    def __eq__(self, other):
+        return True if (self.edge_from == other.edge_from and self.edge_to == other.edge_to) or (
+                    self.edge_from == other.edge_to and self.edge_to == other.edge_from) else False
+
 
 def equality(a):
     edge_list = []
-    l = int((a / 10) ** (-a))+1
+    l = int((a / 10) ** (-a)) + 1
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     for i in tmp:
         edge_list.append(int(i ** (-a)) if i ** (-a) >= 1 else 1)
@@ -67,7 +85,7 @@ g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
 g.assignEdgesToNodes()
 g.printer()
 
-a, b = equality(2.5)
-print(a)
+# a, b = equality(2.5)
+# print(a)
 # g=[1,2,3,4,5,6,7,8,9]
 # print(g[1:])
