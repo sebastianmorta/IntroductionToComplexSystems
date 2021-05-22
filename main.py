@@ -11,11 +11,11 @@ class Graph:
         for node in self.list_of_nodes:
             tmp_list.remove(node)
             for i in range(node.amount_of_edges):
-                node.assignEdges(random.choice(tmp_list))
+                # node.assignEdges(random.choice(tmp_list))
+                node.assignEdges(self.chooseConnection(tmp_list))
+    def chooseConnection(self,list):
 
-    def chooseConnection(self):
         return randint(0, len(self.list_of_nodes))
-    chuj
 
     def printer(self):
         for node in self.list_of_nodes:
@@ -42,6 +42,18 @@ class Edge:
         self.edge_to = edge_to
 
 
-g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
-g.assignEdgesToNodes()
-g.printer()
+def equality(a):
+    edge_list = []
+    l = int((a/10) ** (-a))
+    tmp = [x * 0.1 + a/10 for x in range(0, l)]
+    for i in tmp:
+        edge_list.append(int(i ** (-a)) if i ** (-a) >= 1 else 1)
+    return edge_list, len(edge_list)
+
+
+# g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
+# g.assignEdgesToNodes()
+# g.printer()
+
+a, b = equality(2.5)
+print(a)
