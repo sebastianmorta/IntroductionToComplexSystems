@@ -15,6 +15,7 @@ class Graph:
 
     def chooseConnection(self):
         return randint(0, len(self.list_of_nodes))
+    chuj
 
     def printer(self):
         for node in self.list_of_nodes:
