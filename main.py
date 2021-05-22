@@ -69,7 +69,7 @@ class Edge:
 
     def __eq__(self, other):
         return True if (self.edge_from == other.edge_from and self.edge_to == other.edge_to) or (
-                    self.edge_from == other.edge_to and self.edge_to == other.edge_from) else False
+                self.edge_from == other.edge_to and self.edge_to == other.edge_from) else False
 
 
 def equality(a):
@@ -78,10 +78,12 @@ def equality(a):
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     for i in tmp:
         edge_list.append(int(i ** (-a)) if i ** (-a) >= 1 else 1)
-    return edge_list, len(edge_list)
+    return len(edge_list), edge_list
 
 
-g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
+a, b = equality(2.5)
+# g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
+g = Graph(a,b)
 g.assignEdgesToNodes()
 g.printer()
 
