@@ -43,7 +43,6 @@ class Graph:
         other_node.assignEdges(current_node)
 
     def printer(self):
-        h = []
         for node in self.nodes:
             print("node number: ", node.number_of_node)
             print("amount of edges: ", node.amount_of_edges)
@@ -83,6 +82,7 @@ def equality(a):
     l = int((a / 10) ** (-a)) + 10
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     for i in tmp:
+        # edge_list.append(int(i ** (-a))+5)
         edge_list.append(int(i ** (-a)) if i ** (-a) >= 1 else 1)
     return len(edge_list), edge_list
 
@@ -93,6 +93,7 @@ g = Graph(a, b)
 g.assignEdgesToNodes()
 g.printer()
 print(sum(b))
+print(b)
 # a, b = equality(2.5)
 # print(a)
 # g=[1,2,3,4,5,6,7,8,9]
