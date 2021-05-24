@@ -32,21 +32,18 @@ class Graph:
         for node in self.nodes:
             tmp_list = self.nodes[iter:]
             tmp_list = self.checkFree(tmp_list)
-            # if not tmp_list:
-            #     continue
             print("$$$$$$$$$$$$$$$$$$$$new$$$$$$$$$$$$$$$$$$$$$$$$")
             for i in range(node.amount_of_edges - len(node.edges)):
                 if tmp_list:
                     print("nodes  ", len(self.nodes))
                     print("tmp  ", len(tmp_list))
                     print("iter  ", iter)
-                    print("tmplist",tmp_list)
+                    print("tmplist", tmp_list)
                     rand = random.choice(tmp_list)
                     print("rand  ", rand.number_of_node)
                     print("-----------------------------")
                     if rand.amount_of_edges - len(rand.edges):
                         self.chooseConnection(node, rand)
-
                     tmp_list.remove(rand)
             iter += 1
 
@@ -94,11 +91,10 @@ class Graph:
             writer.writerow(["SN", "from", "to"])
             for i in range(len(self.edges)):
                 writer.writerow([i, self.edges[i].edge_from, self.edges[i].edge_to])
+
     def check(self):
-        a=[]
-        for node in self.nodes:
-            a.append(node.amount_of_edges-len(node.edges))
-        return a
+        return [node.amount_of_edges - len(node.edges) for node in self.nodes]
+
 
 class Node:
     def __init__(self, amount_of_edges, node_number):
@@ -130,15 +126,10 @@ class Edge:
 #     return len(edge_list), edge_list
 
 def equality(a):
-    edge_list = []
     l = int((a / 10) ** (-a)) + 10
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     t = [x for x in tmp if x <= 1.01]
-    for i in range(len(t)):
-        for j in range(i*6):
-            edge_list.append(int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1)
-
-        # edge_list.append(int(i ** (-a))+5)
+    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i )]
     return len(edge_list), edge_list
 
 
@@ -161,11 +152,11 @@ print(sum(g.check()))
 # print(df)
 # df1 = df[['Source', 'Target']]
 # print(df1)
-# g.saveToSCV()
-#
-# df = pd.read_csv("innovators.csv")
-# df1 = df[['from', 'to']]
-# G = nx.Graph()
-# G = nx.from_pandas_edgelist(df1, 'from', 'to')
-# nx.draw(G, with_labels=True)
-# plt.show()
+g.saveToSCV()
+
+df = pd.read_csv("innovators.csv")
+df1 = df[['from', 'to']]
+G = nx.Graph()
+G = nx.from_pandas_edgelist(df1, 'from', 'to')
+nx.draw(G, with_labels=True)
+plt.show()
