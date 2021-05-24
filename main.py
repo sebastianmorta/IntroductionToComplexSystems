@@ -1,6 +1,6 @@
 import csv
 import random
-from random import randint
+from random import randint, choice
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -93,6 +93,17 @@ class Graph:
             if random.random() > 0.5:
                 node.im_mutant = True
 
+    def model1(self):
+        mother = choice(self.nodes)
+        father = self.nodes[choice(mother.edges).edge_to]
+        if mother.im_mutant != father.im_mutant:
+            if mother.im_mutant:
+                father.im_mutant=True
+            else:
+
+
+            print(mother.number_of_node, father.number_of_node)
+
 
 class Node:
     def __init__(self, amount_of_edges, node_number):
@@ -128,8 +139,23 @@ def equality(a):
     l = int((a / 10) ** (-a)) + 10
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     t = [x for x in tmp if x <= 1.01]
-    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i*2)]
+    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i * 2)]
     return len(edge_list), edge_list
+
+
+def drawGraph(g):
+    df = pd.read_csv("innovators.csv")
+    df1 = df[['from', 'to']]
+    color_map = []
+    G = nx.Graph()
+    G = nx.from_pandas_edgelist(df1, 'from', 'to')
+    for node in g.nodes:
+        if node.im_mutant:
+            color_map.append('red')
+        else:
+            color_map.append('green')
+    nx.draw(G, node_color=color_map, with_labels=True)
+    plt.show()
 
 
 a, b = equality(2.5)
@@ -137,6 +163,7 @@ a, b = equality(2.5)
 g = Graph(a, b)
 g.assignEdgesToNodes()
 g.printer()
+g.saveToSCV()
 print("sum", sum(b))
 print("b", b)
 print("len", len(b))
@@ -151,17 +178,5 @@ print(sum(g.check()))
 # print(df)
 # df1 = df[['Source', 'Target']]
 # print(df1)
-g.saveToSCV()
-
-df = pd.read_csv("innovators.csv")
-df1 = df[['from', 'to']]
-color_map = []
-G = nx.Graph()
-G = nx.from_pandas_edgelist(df1, 'from', 'to')
-for node in g.nodes:
-    if node.im_mutant:
-        color_map.append('red')
-    else:
-        color_map.append('green')
-nx.draw(G, node_color=color_map, with_labels=True)
-plt.show()
+drawGraph(g)
+g.model1()
