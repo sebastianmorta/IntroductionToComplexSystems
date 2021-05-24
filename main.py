@@ -30,42 +30,34 @@ class Graph:
     def assignEdgesToNodes(self):
         iter = 1
         for node in self.nodes:
-            tmp_list = self.nodes[iter:]
-            tmp_list = self.checkFree(tmp_list)
-            print("$$$$$$$$$$$$$$$$$$$$new$$$$$$$$$$$$$$$$$$$$$$$$")
+            tmp_list = self.checkFree(self.nodes[iter:])
             for i in range(node.amount_of_edges - len(node.edges)):
                 if tmp_list:
-                    print("nodes  ", len(self.nodes))
-                    print("tmp  ", len(tmp_list))
-                    print("iter  ", iter)
-                    print("tmplist", tmp_list)
                     rand = random.choice(tmp_list)
-                    print("rand  ", rand.number_of_node)
-                    print("-----------------------------")
                     if rand.amount_of_edges - len(rand.edges):
                         self.chooseConnection(node, rand)
                     tmp_list.remove(rand)
             iter += 1
 
-    # def assignEdgesToNodes(self):
-    #     iter = 1
-    #     for node in self.nodes:
-    #         tmp_list = self.nodes[iter:]
-    #         if not tmp_list:
-    #             continue
-    #         print("$$$$$$$$$$$$$$$$$$$$new$$$$$$$$$$$$$$$$$$$$$$$$")
-    #         for i in range(node.amount_of_edges - len(node.edges)):
-    #             print("nodes  ", len(self.nodes))
-    #             print("tmp  ", len(tmp_list))
-    #             print("iter  ", iter)
-    #             rand = randint(0, len(tmp_list) - 1)
-    #             print("rand  ", rand)
-    #             print("-----------------------------")
-    #             if tmp_list[rand].amount_of_edges - len(tmp_list[rand].edges):
-    #                 self.chooseConnection(node, tmp_list[rand])
-    #
-    #             tmp_list.remove(tmp_list[rand])
-    #         iter += 1
+    #     def assignEdgesToNodes(self):
+    #         iter = 1
+    #         for node in self.nodes:
+    #             tmp_list = self.nodes[iter:]
+    #             tmp_list = self.checkFree(tmp_list)
+    #             print("$$$$$$$$$$$$$$$$$$$$new$$$$$$$$$$$$$$$$$$$$$$$$")
+    #             for i in range(node.amount_of_edges - len(node.edges)):
+    #                 if tmp_list:
+    #                     print("nodes  ", len(self.nodes))
+    #                     print("tmp  ", len(tmp_list))
+    #                     print("iter  ", iter)
+    #                     print("tmplist", tmp_list)
+    #                     rand = random.choice(tmp_list)
+    #                     print("rand  ", rand.number_of_node)
+    #                     print("-----------------------------")
+    #                     if rand.amount_of_edges - len(rand.edges):
+    #                         self.chooseConnection(node, rand)
+    #                     tmp_list.remove(rand)
+    #             iter += 1
 
     def chooseConnection(self, current_node, other_node):
         current_node.assignEdges(other_node)
@@ -88,12 +80,18 @@ class Graph:
     def saveToSCV(self):
         with open('innovators.csv', 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["SN", "from", "to"])
+            writer.writerow(["SN", "from", "to", "color"])
             for i in range(len(self.edges)):
                 writer.writerow([i, self.edges[i].edge_from, self.edges[i].edge_to])
+        self.mutating()
 
     def check(self):
         return [node.amount_of_edges - len(node.edges) for node in self.nodes]
+
+    def mutating(self):
+        for node in self.nodes:
+            if random.random() > 0.5:
+                node.im_mutant = True
 
 
 class Node:
@@ -101,6 +99,7 @@ class Node:
         self.number_of_node = node_number
         self.amount_of_edges = amount_of_edges
         self.edges = []
+        self.im_mutant = False
 
     def assignEdges(self, other):
         self.edges.append(Edge(self.number_of_node, other.number_of_node))
@@ -129,7 +128,7 @@ def equality(a):
     l = int((a / 10) ** (-a)) + 10
     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
     t = [x for x in tmp if x <= 1.01]
-    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i )]
+    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i*2)]
     return len(edge_list), edge_list
 
 
@@ -156,7 +155,13 @@ g.saveToSCV()
 
 df = pd.read_csv("innovators.csv")
 df1 = df[['from', 'to']]
+color_map = []
 G = nx.Graph()
 G = nx.from_pandas_edgelist(df1, 'from', 'to')
-nx.draw(G, with_labels=True)
+for node in g.nodes:
+    if node.im_mutant:
+        color_map.append('red')
+    else:
+        color_map.append('green')
+nx.draw(G, node_color=color_map, with_labels=True)
 plt.show()
