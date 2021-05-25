@@ -1,6 +1,6 @@
 import csv
 import random
-from random import randint, choice
+from random import randint, choice, random
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ class Graph:
             tmp_list = self.checkFree(self.nodes[iter:])
             for i in range(node.amount_of_edges - len(node.edges)):
                 if tmp_list:
-                    rand = random.choice(tmp_list)
+                    rand = choice(tmp_list)
                     if rand.amount_of_edges - len(rand.edges):
                         self.chooseConnection(node, rand)
                     tmp_list.remove(rand)
@@ -90,19 +90,20 @@ class Graph:
 
     def mutating(self):
         for node in self.nodes:
-            if random.random() > 0.5:
-                node.im_mutant = True
+            if random() > 0.5:
+                node.is_mutant = True
 
-    def model1(self):
+    def model1(self, s):
         mother = choice(self.nodes)
         father = self.nodes[choice(mother.edges).edge_to]
-        if mother.im_mutant != father.im_mutant:
-            if mother.im_mutant:
-                father.im_mutant=True
+        if mother.is_mutant != father.is_mutant:
+            if mother.is_mutant:
+                father.is_mutant = True
             else:
+                if random() < s:
+                    father.is_mutant = False
 
-
-            print(mother.number_of_node, father.number_of_node)
+            # print(mother.number_of_node, father.number_of_node)
 
 
 class Node:
@@ -110,7 +111,7 @@ class Node:
         self.number_of_node = node_number
         self.amount_of_edges = amount_of_edges
         self.edges = []
-        self.im_mutant = False
+        self.is_mutant = False
 
     def assignEdges(self, other):
         self.edges.append(Edge(self.number_of_node, other.number_of_node))
@@ -150,12 +151,13 @@ def drawGraph(g):
     G = nx.Graph()
     G = nx.from_pandas_edgelist(df1, 'from', 'to')
     for node in g.nodes:
-        if node.im_mutant:
+        if node.is_mutant:
             color_map.append('red')
         else:
             color_map.append('green')
     nx.draw(G, node_color=color_map, with_labels=True)
     plt.show()
+    print("color",color_map)
 
 
 a, b = equality(2.5)
@@ -179,4 +181,6 @@ print(sum(g.check()))
 # df1 = df[['Source', 'Target']]
 # print(df1)
 drawGraph(g)
-g.model1()
+for i in range(10000):
+    g.model1(0.4)
+drawGraph(g)
