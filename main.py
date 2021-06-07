@@ -90,7 +90,7 @@ class Graph:
 
     def mutating(self):
         for node in self.nodes:
-            if random() > 0.5:
+            if random() > 0.8:
                 node.is_mutant = True
 
     def model1(self, s):
