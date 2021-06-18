@@ -71,19 +71,21 @@ class Graph:
                 print("edge from: ", edge.edge_from, "edge to: ", edge.edge_to)
                 self.edges.append(edge)
             print("===================================================================")
-        print(self.edges)
-        print(len(self.edges))
+        print("edges", self.edges)
+        print("len edges", len(self.edges))
         self.edges = removeDuplicates(self.edges)
-        print(self.edges)
-        print(len(self.edges))
-
-    def saveToSCV(self):
-        with open('innovators.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["SN", "from", "to", "color"])
-            for i in range(len(self.edges)):
-                writer.writerow([i, self.edges[i].edge_from, self.edges[i].edge_to])
+        print("edges after rmv", self.edges)
+        print(" len edges after rmv", len(self.edges))
         self.mutating()
+
+    def saveToCSV(self):
+        with open("results.csv", 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["SN", "from", ])
+            e_data = np.array([[i for i in range(len(self.edges))],
+                               [self.edges[i].edge_to for i in range(len(self.edges))],
+                               [self.edges[i].edge_from for i in range(len(self.edges))]]).T
+            writer.writerows(e_data)
 
     def check(self):
         return [node.amount_of_edges - len(node.edges) for node in self.nodes]
@@ -136,11 +138,21 @@ class Edge:
 #         edge_list.append(int(i ** (-a)) if i ** (-a) >= 1 else 1)
 #     return len(edge_list), edge_list
 
-def equality(a):
-    l = int((a / 10) ** (-a)) + 10
-    tmp = [x * 0.1 + a / 10 for x in range(0, l)]
-    t = [x for x in tmp if x <= 1.01]
-    edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i * 2)]
+# def equality(a):
+#     l = int((a / 10) ** (-a)) + 10
+#     tmp = [x * 0.1 + a / 10 for x in range(0, l)]
+#     t = [x for x in tmp if x <= 1.01]
+#     edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i * 2)]
+#     return len(edge_list), edge_list
+def equality(a, N):
+    values_base = np.linspace(1, 40, N)
+    print("valvas", values_base)
+    edge_list = [int((v ** (-a)) * N) if int((v ** (-a)) * N) > 1 else 1 for v in values_base]
+
+    # l = int((a / 10) ** (-a)) + 10
+    # tmp = [x * 0.1 + a / 10 for x in range(0, l)]
+    # t = [x for x in tmp if x <= 1.01]
+    # edge_list = [int(t[i] ** (-a)) if t[i] ** (-a) >= 1 else 1 for i in range(len(t)) for _ in range(i * 280)]
     return len(edge_list), edge_list
 
 
@@ -148,24 +160,24 @@ def drawGraph(g):
     df = pd.read_csv("innovators.csv")
     df1 = df[['from', 'to']]
     color_map = []
-    G = nx.Graph()
-    G = nx.from_pandas_edgelist(df1, 'from', 'to')
+    # G = nx.Graph()
+    # G = nx.from_pandas_edgelist(df1, 'from', 'to')
     for node in g.nodes:
         if node.is_mutant:
             color_map.append('red')
         else:
             color_map.append('green')
-    nx.draw(G, node_color=color_map, with_labels=True)
-    plt.show()
-    print("color",color_map)
+    # nx.draw(G, node_color=color_map, with_labels=True)
+    # plt.show()
+    print("color", color_map)
 
 
-a, b = equality(2.5)
+a, b = equality(2.5, 100)
 # g = Graph(10, [7, 4, 3, 2, 2, 2, 1, 1, 1, 1])
 g = Graph(a, b)
 g.assignEdgesToNodes()
 g.printer()
-g.saveToSCV()
+g.saveToCSV()
 print("sum", sum(b))
 print("b", b)
 print("len", len(b))
@@ -181,6 +193,6 @@ print(sum(g.check()))
 # df1 = df[['Source', 'Target']]
 # print(df1)
 drawGraph(g)
-for i in range(10000):
+for i in range(10):
     g.model1(0.4)
 drawGraph(g)
