@@ -1,3 +1,4 @@
+import csv
 from copy import deepcopy
 from random import choice
 
@@ -15,6 +16,11 @@ def getAmoutnOfMutatns(g):
             count_not_mutatns += 1
     return [count_mutatns, count_not_mutatns, count_mutatns / (count_mutatns + count_not_mutatns),
             count_not_mutatns / (count_mutatns + count_not_mutatns), count_mutatns / count_not_mutatns]
+
+def saveToCSV(data, name):
+    with open(name + ".csv", 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
 
 
 def getAvg(list):
@@ -88,13 +94,13 @@ print(sum(g1.check()))
 # print(df1)
 
 
-data_for_g1 = np.empty((0, 5), int)
-data_for_g2 = np.empty((0, 5), int)
-data_for_g3 = np.empty((0, 5), int)
+# data_for_g1 = np.empty((0, 5), int)
+# data_for_g2 = np.empty((0, 5), int)
+# data_for_g3 = np.empty((0, 5), int)
 
 s_VM = [0.01, 0.02, 0.08]
 s_IP = [0.004, 0.008, 0.016]
-K = [10, 3, 7, 10, 30, 50, 70, 100, 170, 200]
+K = [1, 3, 7, 10, 30, 50, 70, 100, 130, 150, 170, 200]
 #
 # print("g1")
 # drawGraph(g1)
@@ -106,36 +112,79 @@ K = [10, 3, 7, 10, 30, 50, 70, 100, 170, 200]
 # drawGraph(g1)
 models, s, k, stab = 2, 3, 18, 1000
 
-matrix_for_probability = np.zeros((3, 10))
+matrix_for_probability = np.zeros((3, 12))
 print("g2")
 
-for sv_idx, sv in enumerate(s_VM):
+for sv_idx, si in enumerate(s_VM):
     for k_idx, k in enumerate(K):
         stability_tab = 0
+        print("k = ",k,"s = ",s )
         for z in range(1000):
+
             setAllNotMutatn(g2)
-            initMutatnsChart2(g2, 200)  # inicjalizacja pierwszego mutanta
+            initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
             mutant_amt = checkStability(g2)
             list_of_changes = []
             for i in range(100):
                 print(checkStability(g2))
-                g2.voterModel(0.008)
+                g2.voterModel(si)
                 list_of_changes.append(checkStability(g2))
             mutant_amt = checkStability(g2)
             print("mt amt", mutant_amt)
             for t in range(100):  # ilość iteracji dla jednego stopnia
                 for i in range(100):
-                    print("il mut", i, "      ", z, '   ', checkStability(g2))
-                    g2.voterModel(0.008)
+                    # print("il mut", i, "      ", z, '   ', checkStability(g2))
+                    g2.voterModel(si)
                     list_of_changes.append(checkStability(g2))
-                if getAvg(list_of_changes[(len(list_of_changes) - 100):]) != (mutant_amt):
+                if getAvg(list_of_changes[(len(list_of_changes) - 100):]) != mutant_amt:
                     mutant_amt = checkStability(g2)
                 else:
                     print("end mnt amt", mutant_amt)
                     stability_tab += 1
                     break
         matrix_for_probability[sv_idx, k_idx] = stability_tab / 1000
+saveToCSV(matrix_for_probability, "VMchart2")
 print(matrix_for_probability)
+
+
+
+
+
+
+matrix_for_probabilityIP = np.zeros((3, 12))
+print("g3")
+
+for sv_idx, si in enumerate(s_IP):
+    for k_idx, k in enumerate(K):
+        stability_tab = 0
+        print("k = ", k, "s = ", si)
+        for z in range(1000):
+
+            setAllNotMutatn(g3)
+            initMutatnsChart2(g3, k)  # inicjalizacja pierwszego mutanta
+            mutant_amt = checkStability(g3)
+            list_of_changes = []
+            for i in range(100):
+                print(checkStability(g3))
+                g3.voterModel(si)
+                list_of_changes.append(checkStability(g3))
+            mutant_amt = checkStability(g3)
+            print("mt amt", mutant_amt)
+            for t in range(100):  # ilość iteracji dla jednego stopnia
+                for i in range(100):
+                    # print("il mut", i, "      ", z, '   ', checkStability(g2))
+                    g3.voterModel(si)
+                    list_of_changes.append(checkStability(g3))
+                if getAvg(list_of_changes[(len(list_of_changes) - 100):]) != mutant_amt:
+                    mutant_amt = checkStability(g3)
+                else:
+                    print("end mnt amt", mutant_amt)
+                    stability_tab += 1
+                    break
+        matrix_for_probability[sv_idx, k_idx] = stability_tab / 1000
+saveToCSV(matrix_for_probability, "IPchart2")
+print(matrix_for_probability)
+
 
 '''
 
