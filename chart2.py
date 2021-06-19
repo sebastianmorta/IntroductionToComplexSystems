@@ -1,4 +1,5 @@
 from copy import deepcopy
+from random import choice
 
 from classes import Graph, Node, Edge
 import numpy as np
@@ -34,7 +35,7 @@ def checkStability(g):
 def equality(a, N):
     values_base = np.linspace(1, 14, N)
 
-    edge_list = [int(((v + 1.5) ** (-a)) * N) if int((v ** (-a)) * N) > 1 else 1 for v in values_base]
+    edge_list = [int(((v + 0.7) ** (-a)) * N) if int((v ** (-a)) * N) > 1 else 1 for v in values_base]
 
     return len(edge_list), edge_list
 
@@ -44,8 +45,15 @@ def setAllNotMutatn(g):
         node.is_mutant = False
 
 
+# def initMutatnsChart2(g, level):
+#     for node in g.nodes:
+#         if level - 5 < node.amount_of_edges < level + 5:
+#             node.is_mutant = True
+#             break
+
 def initMutatnsChart2(g, level):
-    for node in g.nodes:
+    while True:
+        node = choice(g.nodes)
         if level - 5 < node.amount_of_edges < level + 5:
             node.is_mutant = True
             break
@@ -86,7 +94,7 @@ data_for_g3 = np.empty((0, 5), int)
 
 s_VM = [0.01, 0.02, 0.08]
 s_IP = [0.004, 0.008, 0.016]
-K = [1, 3, 7, 10, 30, 50, 70, 100, 170, 200]
+K = [10, 3, 7, 10, 30, 50, 70, 100, 170, 200]
 #
 # print("g1")
 # drawGraph(g1)
@@ -98,12 +106,47 @@ K = [1, 3, 7, 10, 30, 50, 70, 100, 170, 200]
 # drawGraph(g1)
 models, s, k, stab = 2, 3, 18, 1000
 
-matrix_for_probability = np.zeros((3, int(len(K))+1))
+matrix_for_probability = np.zeros((3, 10))
 print("g2")
+
+for sv_idx, sv in enumerate(s_VM):
+    for k_idx, k in enumerate(K):
+        stability_tab = 0
+        for z in range(1000):
+            setAllNotMutatn(g2)
+            initMutatnsChart2(g2, 200)  # inicjalizacja pierwszego mutanta
+            mutant_amt = checkStability(g2)
+            list_of_changes = []
+            for i in range(100):
+                print(checkStability(g2))
+                g2.voterModel(0.008)
+                list_of_changes.append(checkStability(g2))
+            mutant_amt = checkStability(g2)
+            print("mt amt", mutant_amt)
+            for t in range(100):  # ilość iteracji dla jednego stopnia
+                for i in range(100):
+                    print("il mut", i, "      ", z, '   ', checkStability(g2))
+                    g2.voterModel(0.008)
+                    list_of_changes.append(checkStability(g2))
+                if getAvg(list_of_changes[(len(list_of_changes) - 100):]) != (mutant_amt):
+                    mutant_amt = checkStability(g2)
+                else:
+                    print("end mnt amt", mutant_amt)
+                    stability_tab += 1
+                    break
+        matrix_for_probability[sv_idx, k_idx] = stability_tab / 1000
+print(matrix_for_probability)
+
+'''
+
 
 for sv_idx, sv in enumerate(s_VM):
     for idx_k, k in enumerate(K):
         setAllNotMutatn(g2)  # ustawienie wszystkich na niemutanty
+        initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
+        initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
+        initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
+        initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
         initMutatnsChart2(g2, k)  # inicjalizacja pierwszego mutanta
         mut_amount = checkStability(g2)  # przypisanie aktualnej liczby mutantów
 
@@ -111,18 +154,17 @@ for sv_idx, sv in enumerate(s_VM):
         ilosc_prob_i_stabilizacja = 0
         setAllNotMutatn(g2)
         for t in range(1000):  # ilość iteracji dla jednego stopnia
+            print("mutamoutn",mut_amount)
             if t==0:
-                for st in range(11000):
+                for st in range(110000):
                     # list_of_changes.append(checkStability(g2))  # dodajemy aktualną liczbę mutantów
                     g2.voterModel(sv)  # mutujemy
             for st in range(1100):
                 list_of_changes.append(checkStability(g2))  # dodajemy aktualną liczbę mutantów
                 g2.voterModel(sv)  # mutujemy
-            if getAvg(list_of_changes[(len(list_of_changes) - 1000):]) > (mut_amount + 1) or getAvg(
-                    list_of_changes[
-                    (len(list_of_changes) - 1000):]) < mut_amount - 1:  # sprawdzamy czy liczba mutków sie zmieniła
+            if getAvg(list_of_changes[(len(list_of_changes) - 10000):]) != (mut_amount) :  # sprawdzamy czy liczba mutków sie zmieniła
+                print('mutamount2',mut_amount)
                 mut_amount = checkStability(g2)  # aktualizujemy liczbe mutantów
-                print(mut_amount)
                 print("dupa")
             else:
                 print("lipa")
@@ -165,3 +207,4 @@ print(matrix_for_probability)
 #         g3.invasionModel(0.004)
 # saveToCSV(data_for_g3, "datachart2 g3")
 # drawGraph(g3)
+'''

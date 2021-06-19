@@ -118,7 +118,7 @@ class Graph:
             if father.is_mutant:
                 mother.is_mutant = True
             else:
-                if random() < (1-s):
+                if random() < (s):
                     mother.is_mutant = False
 
             # if father.is_mutant:
